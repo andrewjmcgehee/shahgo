@@ -6,8 +6,11 @@ import (
 
 // just a driver for random testing for now
 func main() {
-	squares := [7]int{engine.A1, engine.A4, engine.B4, engine.E4, engine.G4, engine.H4, engine.H8}
+	blocker := uint64(0)
+	engine.SetBit(&blocker, engine.C6)
+	engine.SetBit(&blocker, engine.D3)
+	squares := [1]int{engine.D6}
 	for _, square := range squares {
-		engine.Display(engine.MaskRookAttacks(square), true)
+		engine.Display(engine.RookRays(square, true, blocker), true)
 	}
 }

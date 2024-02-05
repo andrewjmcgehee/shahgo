@@ -25,7 +25,7 @@ func MaskPawnAttacks(side int, square int) uint64 {
 	attacks := uint64(0)
 	bitboard := uint64(0)
 	SetBit(&bitboard, square)
-	if side == 0 {
+	if side == WHITE {
 		attacks |= bitboard << 7
 		attacks |= bitboard << 9
 	} else {
@@ -80,38 +80,100 @@ func MaskKingAttacks(square int) uint64 {
 	return attacks
 }
 
-func MaskBishopAttacks(square int) uint64 {
-	attacks := uint64(0)
+func BishopRays(square int, edges bool, occupied uint64) uint64 {
+	rays := uint64(0)
+	lo := 1
+	hi := 6
+	if edges {
+		lo = 0
+		hi = 7
+	}
 	rank := RankOf(square)
 	file := FileOf(square)
-	for r, f := rank+1, file+1; r <= 6 && f <= 6; r, f = r+1, f+1 {
-		attacks |= uint64(1) << uint(r*8+f)
+	for r, f := rank+1, file+1; r <= hi && f <= hi; r, f = r+1, f+1 {
+		bit := uint64(1) << uint(r*8+f)
+		rays |= bit
+		if occupied&bit != 0 {
+			break
+		}
 	}
-	for r, f := rank+1, file-1; r <= 6 && f >= 1; r, f = r+1, f-1 {
-		attacks |= uint64(1) << uint(r*8+f)
+	for r, f := rank+1, file-1; r <= hi && f >= lo; r, f = r+1, f-1 {
+		bit := uint64(1) << uint(r*8+f)
+		rays |= bit
+		if occupied&bit != 0 {
+			break
+		}
 	}
-	for r, f := rank-1, file+1; r >= 1 && f <= 6; r, f = r-1, f+1 {
-		attacks |= uint64(1) << uint(r*8+f)
+	for r, f := rank-1, file+1; r >= lo && f <= hi; r, f = r-1, f+1 {
+		bit := uint64(1) << uint(r*8+f)
+		rays |= bit
+		if occupied&bit != 0 {
+			break
+		}
 	}
-	for r, f := rank-1, file-1; r >= 1 && f >= 1; r, f = r-1, f-1 {
-		attacks |= uint64(1) << uint(r*8+f)
+	for r, f := rank-1, file-1; r >= lo && f >= lo; r, f = r-1, f-1 {
+		bit := uint64(1) << uint(r*8+f)
+		rays |= bit
+		if occupied&bit != 0 {
+			break
+		}
 	}
-	return attacks
+	return rays
 }
 
-func MaskRookAttacks(square int) uint64 {
-	attacks := uint64(0)
+func RelevantBishopOccupants(square int) uint64 {
+	return BishopRays(square, false, 0)
+}
+
+func MaskBishopAttacks(square int, occupied uint64) uint64 {
+	return BishopRays(square, true, occupied)
+}
+
+func RookRays(square int, edges bool, occupied uint64) uint64 {
+	rays := uint64(0)
+	lo := 1
+	hi := 6
+	if edges {
+		lo = 0
+		hi = 7
+	}
 	rank := RankOf(square)
 	file := FileOf(square)
-	for r := 1; r <= 6; r++ {
-		if r != rank {
-			attacks |= uint64(1) << uint(r*8+file)
+	for r := rank - 1; r >= lo; r-- {
+		bit := uint64(1) << uint(r*8+file)
+		rays |= bit
+		if occupied&bit != 0 {
+			break
 		}
 	}
-	for f := 1; f <= 6; f++ {
-		if f != file {
-			attacks |= uint64(1) << uint(rank*8+f)
+	for r := rank + 1; r <= hi; r++ {
+		bit := uint64(1) << uint(r*8+file)
+		rays |= bit
+		if occupied&bit != 0 {
+			break
 		}
 	}
-	return attacks
+	for f := file - 1; f >= lo; f-- {
+		bit := uint64(1) << uint(rank*8+f)
+		rays |= bit
+		if occupied&bit != 0 {
+			break
+		}
+	}
+	for f := file + 1; f <= hi; f++ {
+		bit := uint64(1) << uint(rank*8+f)
+		rays |= bit
+		if occupied&bit != 0 {
+			break
+		}
+	}
+	return rays
+}
+
+func RelevantRookOccupants(square int) uint64 {
+	return RookRays(square, false, 0)
+}
+
+func MaskRookAttacks(square int, occupied uint64) uint64 {
+	return RookRays(square, true, occupied)
 }
