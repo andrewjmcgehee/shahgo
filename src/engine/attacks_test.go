@@ -28,3 +28,26 @@ func TestMaskPawnAttacks(t *testing.T) {
 		t.Errorf("MaskPawnAttacks(BLACK, E4) = %v, expected %v", actual, expected)
 	}
 }
+
+func TestMaskKnightAttacks(t *testing.T) {
+	expected := uint64(0x0000020400040200)
+	if actual := MaskKnightAttacks(A4); expected != actual {
+		t.Errorf("MaskKnightAttacks(A4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x0000050800080500)
+	if actual := MaskKnightAttacks(B4); expected != actual {
+		t.Errorf("MaskKnightAttacks(B4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x0000284400442800)
+	if actual := MaskKnightAttacks(E4); expected != actual {
+		t.Errorf("MaskKnightAttacks(E4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x0000a0100010a000)
+	if actual := MaskKnightAttacks(G4); expected != actual {
+		t.Errorf("MaskKnightAttacks(G4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x0000402000204000)
+	if actual := MaskKnightAttacks(H4); expected != actual {
+		t.Errorf("MaskKnightAttacks(H4) = %v, expected %v", actual, expected)
+	}
+}
