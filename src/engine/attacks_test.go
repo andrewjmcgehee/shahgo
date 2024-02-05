@@ -98,3 +98,65 @@ func TestMaskKingAttacks(t *testing.T) {
 		t.Errorf("MaskKingAttacks(H8) = %v, expected %v", actual, expected)
 	}
 }
+
+func TestMaskBishopAttacks(t *testing.T) {
+	expected := uint64(0x0040201008040200)
+	if actual := MaskBishopAttacks(A1); expected != actual {
+		t.Errorf("MaskBishopAttacks(A1) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x0008040200020400)
+	if actual := MaskBishopAttacks(A4); expected != actual {
+		t.Errorf("MaskBishopAttacks(A4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x0010080400040800)
+	if actual := MaskBishopAttacks(B4); expected != actual {
+		t.Errorf("MaskBishopAttacks(B4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x0002442800284400)
+	if actual := MaskBishopAttacks(E4); expected != actual {
+		t.Errorf("MaskBishopAttacks(E4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x0008102000201000)
+	if actual := MaskBishopAttacks(G4); expected != actual {
+		t.Errorf("MaskBishopAttacks(G4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x0010204000402000)
+	if actual := MaskBishopAttacks(H4); expected != actual {
+		t.Errorf("MaskBishopAttacks(H4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x0040201008040200)
+	if actual := MaskBishopAttacks(H8); expected != actual {
+		t.Errorf("MaskBishopAttacks(H8) = %v, expected %v", actual, expected)
+	}
+}
+
+func TestMaskRookAttacks(t *testing.T) {
+	expected := uint64(0x000101010101017e)
+	if actual := MaskRookAttacks(A1); expected != actual {
+		t.Errorf("MaskRookAttacks(A1) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x000101017e010100)
+	if actual := MaskRookAttacks(A4); expected != actual {
+		t.Errorf("MaskRookAttacks(A4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x000202027c020200)
+	if actual := MaskRookAttacks(B4); expected != actual {
+		t.Errorf("MaskRookAttacks(B4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x001010106e101000)
+	if actual := MaskRookAttacks(E4); expected != actual {
+		t.Errorf("MaskRookAttacks(E4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x004040403e404000)
+	if actual := MaskRookAttacks(G4); expected != actual {
+		t.Errorf("MaskRookAttacks(G4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x008080807e808000)
+	if actual := MaskRookAttacks(H4); expected != actual {
+		t.Errorf("MaskRookAttacks(H4) = %v, expected %v", actual, expected)
+	}
+	expected = uint64(0x7e80808080808000)
+	if actual := MaskRookAttacks(H8); expected != actual {
+		t.Errorf("MaskRookAttacks(H8) = %v, expected %v", actual, expected)
+	}
+}

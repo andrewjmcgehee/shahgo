@@ -79,3 +79,39 @@ func MaskKingAttacks(square int) uint64 {
 	}
 	return attacks
 }
+
+func MaskBishopAttacks(square int) uint64 {
+	attacks := uint64(0)
+	rank := RankOf(square)
+	file := FileOf(square)
+	for r, f := rank+1, file+1; r <= 6 && f <= 6; r, f = r+1, f+1 {
+		attacks |= uint64(1) << uint(r*8+f)
+	}
+	for r, f := rank+1, file-1; r <= 6 && f >= 1; r, f = r+1, f-1 {
+		attacks |= uint64(1) << uint(r*8+f)
+	}
+	for r, f := rank-1, file+1; r >= 1 && f <= 6; r, f = r-1, f+1 {
+		attacks |= uint64(1) << uint(r*8+f)
+	}
+	for r, f := rank-1, file-1; r >= 1 && f >= 1; r, f = r-1, f-1 {
+		attacks |= uint64(1) << uint(r*8+f)
+	}
+	return attacks
+}
+
+func MaskRookAttacks(square int) uint64 {
+	attacks := uint64(0)
+	rank := RankOf(square)
+	file := FileOf(square)
+	for r := 1; r <= 6; r++ {
+		if r != rank {
+			attacks |= uint64(1) << uint(r*8+file)
+		}
+	}
+	for f := 1; f <= 6; f++ {
+		if f != file {
+			attacks |= uint64(1) << uint(rank*8+f)
+		}
+	}
+	return attacks
+}
