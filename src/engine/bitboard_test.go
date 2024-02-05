@@ -136,7 +136,7 @@ func TestTestBit(t *testing.T) {
 			expected = false
 		}
 		if actual := TestBit(bitboard, square); expected != actual {
-			t.Errorf("TestBit(0x00000000000000ff, %d) = %v, expected %v", square, actual, expected)
+			t.Errorf("TestBit(0x%016x, %d) = %v, expected %v", bitboard, square, actual, expected)
 		}
 	}
 	bitboard = RANK_2
@@ -146,34 +146,74 @@ func TestTestBit(t *testing.T) {
 			expected = false
 		}
 		if actual := TestBit(bitboard, square); expected != actual {
-			t.Errorf("TestBit(0x000000000000ff00, %d) = %v, expected %v", square, actual, expected)
+			t.Errorf("TestBit(0x%016x, %d) = %v, expected %v", bitboard, square, actual, expected)
 		}
-	}
-}
-
-func TestFlipBit(t *testing.T) {
-	expected := RANK_1
-	var actual uint64 = 0x00000000000000bf
-	if FlipBit(&actual, 6); expected != actual {
-		t.Errorf("FlipBit(0x00000000000000bf, 7) = %x, expected %x", actual, expected)
-	}
-	expected = uint64(0)
-	actual = 1
-	if FlipBit(&actual, 0); expected != actual {
-		t.Errorf("FlipBit(0x0000000000000000, 0) = %x, expected %x", actual, expected)
 	}
 }
 
 func TestSetBit(t *testing.T) {
 	expected := RANK_1
-	var actual uint64 = 0x00000000000000bf
+	pre := uint64(0x00000000000000bf)
+	actual := pre
 	if SetBit(&actual, 6); expected != actual {
-		t.Errorf("SetBit(0x00000000000000bf, 7) = %x, expected %x", actual, expected)
+		t.Errorf("SetBit(&(0x%016x), 7) = 0x%016x, expected 0x%016x", pre, actual, expected)
 	}
 	expected = uint64(1)
-	actual = 1
+	pre = uint64(1)
+	actual = uint64(1)
 	if SetBit(&actual, 0); expected != actual {
-		t.Errorf("SetBit(0x0000000000000001, 0) = %x, expected %x", actual, expected)
+		t.Errorf("SetBit(&(0x%016x), 0) = 0x%016x, expected 0x%016x", pre, actual, expected)
+	}
+}
+
+func TestFlipBit(t *testing.T) {
+	expected := RANK_1
+	pre := uint64(0x00000000000000bf)
+	actual := pre
+	if FlipBit(&actual, 6); expected != actual {
+		t.Errorf("FlipBit(&(0x%016x), 7) = 0x%016x, expected 0x%016x", pre, actual, expected)
+	}
+	expected = uint64(0)
+	pre = uint64(1)
+	actual = pre
+	if FlipBit(&actual, 0); expected != actual {
+		t.Errorf("FlipBit(&(0x%016x), 0) = 0x%016x, expected 0x%016x", pre, actual, expected)
+	}
+}
+
+func TestCountBits(t *testing.T) {
+	bitboard := uint64(5)
+	expected := 2
+	if actual := CountBits(bitboard); expected != actual {
+		t.Errorf("CountBits(0x%016x) = 0x%016x, expected 0x%016x", bitboard, actual, expected)
+	}
+	bitboard = uint64(1)<<63 + (uint64(1)<<63 - 1)
+	expected = 64
+	if actual := CountBits(bitboard); expected != actual {
+		t.Errorf("CountBits(0x%016x) = 0x%016x, expected 0x%016x", bitboard, actual, expected)
+	}
+}
+
+func TestMSBIndex(t *testing.T) {
+	bitboard := uint64(0)
+	expected := -1
+	if actual := MSBIndex(bitboard); expected != actual {
+		t.Errorf("MSBIndex(0x%016x) = %v, expected %v", bitboard, actual, expected)
+	}
+	bitboard = uint64(1)<<63 + (uint64(1)<<63 - 1)
+	expected = 0
+	if actual := MSBIndex(bitboard); expected != actual {
+		t.Errorf("MSBIndex(0x%016x) = %v, expected %v", bitboard, actual, expected)
+	}
+	bitboard = uint64(1)
+	expected = 63
+	if actual := MSBIndex(bitboard); expected != actual {
+		t.Errorf("MSBIndex(0x%016x) = %v, expected %v", bitboard, actual, expected)
+	}
+	bitboard = uint64(7)
+	expected = 61
+	if actual := MSBIndex(bitboard); expected != actual {
+		t.Errorf("MSBIndex(0x%016x) = %v, expected %v", bitboard, actual, expected)
 	}
 }
 

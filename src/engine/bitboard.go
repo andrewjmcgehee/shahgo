@@ -1,6 +1,9 @@
 package engine
 
-import "fmt"
+import (
+	"fmt"
+	"math/bits"
+)
 
 func SafeCoord(rank int, file int) bool {
 	return 0 <= rank && rank < 8 && 0 <= file && file < 8
@@ -62,6 +65,17 @@ func FlipBit(bitboard *uint64, square int) {
 		return
 	}
 	*bitboard ^= (1 << square)
+}
+
+func CountBits(bitboard uint64) int {
+	return bits.OnesCount64(bitboard)
+}
+
+func MSBIndex(bitboard uint64) int {
+	if bitboard == 0 {
+		return -1
+	}
+	return bits.LeadingZeros64(bitboard)
 }
 
 func Display(bitboard uint64, stdout bool) string {
