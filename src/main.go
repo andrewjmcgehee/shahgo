@@ -6,8 +6,8 @@ import (
 
 // just a driver for random testing for now
 func main() {
-	squares := [5]int{engine.A4, engine.B4, engine.E4, engine.G4, engine.H4}
+	squares := [7]int{engine.A1, engine.A4, engine.B4, engine.E4, engine.G4, engine.H4, engine.H8}
 	for _, square := range squares {
-		engine.Display(engine.MaskKnightAttacks(square), true)
+		engine.Display(engine.MaskKingAttacks(square), true)
 	}
 }
