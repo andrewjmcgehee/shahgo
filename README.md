@@ -1,2 +1,3 @@
-# gomate
-a chess engine in golang
+# shahgo
+
+a chess engine written in Go by andrewjmcgehee
