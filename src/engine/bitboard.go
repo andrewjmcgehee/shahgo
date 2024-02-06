@@ -5,84 +5,90 @@ import (
 	"math/bits"
 )
 
-func SafeCoord(rank int, file int) bool {
-	return 0 <= rank && rank < 8 && 0 <= file && file < 8
+func SafeCoord(rank uint64, file uint64) bool {
+	return rank < 8 && file < 8
 }
 
-func UnsafeSquare(square int) bool {
-	return square < 0 || square >= 64
+func SafeSquare(square uint64) bool {
+	return square < 64
 }
 
-func UnsafeDim(dim int) bool {
-	return dim < 0 || dim >= 8
+func SafeDim(dim uint64) bool {
+	return dim < 8
 }
 
-func FileOf(square int) int {
-	if UnsafeSquare(square) {
+func FileOf(square uint64) uint64 {
+	if !SafeSquare(square) {
 		err := fmt.Sprintf("file_of received unsafe square: %d", square)
 		panic(err)
 	}
 	return square % 8
 }
 
-func RankOf(square int) int {
-	if UnsafeSquare(square) {
+func RankOf(square uint64) uint64 {
+	if !SafeSquare(square) {
 		err := fmt.Sprintf("rank_of received unsafe square: %d", square)
 		panic(err)
 	}
 	return square / 8
 }
 
-func SquareFrom(rank int, file int) int {
-	if UnsafeDim(rank) {
+func SquareFrom(rank uint64, file uint64) uint64 {
+	if !SafeDim(rank) {
 		err := fmt.Sprintf("square_from received unsafe rank: %d", rank)
 		panic(err)
 	}
-	if UnsafeDim(file) {
+	if !SafeDim(file) {
 		err := fmt.Sprintf("square_from received unsafe file: %d", file)
 		panic(err)
 	}
 	return rank*8 + file
 }
 
-func TestBit(bitboard uint64, square int) bool {
-	if UnsafeSquare(square) {
+func TestBit(bitboard uint64, square uint64) bool {
+	if !SafeSquare(square) {
 		err := fmt.Sprintf("test_bit received unsafe square: %d", square)
 		panic(err)
 	}
 	return bitboard&(1<<square) != 0
 }
 
-func SetBit(bitboard *uint64, square int) {
-	if UnsafeSquare(square) {
+func SetBit(bitboard *uint64, square uint64) {
+	if !SafeSquare(square) {
 		return
 	}
 	*bitboard |= (1 << square)
 }
 
-func FlipBit(bitboard *uint64, square int) {
-	if UnsafeSquare(square) {
+func FlipBit(bitboard *uint64, square uint64) {
+	if !SafeSquare(square) {
 		return
 	}
 	*bitboard ^= (1 << square)
 }
 
-func CountBits(bitboard uint64) int {
-	return bits.OnesCount64(bitboard)
+func PopBit(bitboard *uint64, square uint64) {
+	if TestBit(*bitboard, square) {
+		FlipBit(bitboard, square)
+	}
 }
 
-func MSBIndex(bitboard uint64) int {
+func CountBits(bitboard uint64) uint64 {
+	return uint64(bits.OnesCount64(bitboard))
+}
+
+func LSBIndex(bitboard uint64) uint64 {
 	if bitboard == 0 {
-		return -1
+		return 64 // special value to indicate no LSB
 	}
-	return bits.LeadingZeros64(bitboard)
+	return uint64(bits.OnesCount64((bitboard & -bitboard) - 1))
 }
 
 func Display(bitboard uint64, stdout bool) string {
 	var repr string
-	for rank := 7; rank >= 0; rank-- {
-		repr += fmt.Sprintf("%d ", rank+1)
-		for file := 0; file < 8; file++ {
+	for rank := uint64(0); rank < 8; rank++ {
+		repr += fmt.Sprintf("%d ", 8-rank)
+		for file := uint64(0); file < 8; file++ {
 			if TestBit(bitboard, SquareFrom(rank, file)) {
 				repr += fmt.Sprintf(" 1")
 			} else {

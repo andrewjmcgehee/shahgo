@@ -17,12 +17,6 @@ func TestSafeCoord(t *testing.T) {
 		t.Errorf("SafeCoord(0, 7) = %v, expected %v", actual, expected)
 	}
 	expected = false
-	if actual := SafeCoord(-1, 0); expected != actual {
-		t.Errorf("SafeCoord(-1, 0) = %v, expected %v", actual, expected)
-	}
-	if actual := SafeCoord(0, -1); expected != actual {
-		t.Errorf("SafeCoord(0, -1) = %v, expected %v", actual, expected)
-	}
 	if actual := SafeCoord(8, 0); expected != actual {
 		t.Errorf("SafeCoord(8, 0) = %v, expected %v", actual, expected)
 	}
@@ -34,43 +28,35 @@ func TestSafeCoord(t *testing.T) {
 
 func TestUnsafeSquare(t *testing.T) {
 	expected := true
-	if actual := UnsafeSquare(-1); expected != actual {
-		t.Errorf("UnsafeSquare(-1) = %v, expected %v", actual, expected)
+	if actual := SafeSquare(0); expected != actual {
+		t.Errorf("SafeSquare(0) = %v, expected %v", actual, expected)
+	}
+	if actual := SafeSquare(63); expected != actual {
+		t.Errorf("SafeSquare(63) = %v, expected %v", actual, expected)
 	}
 	expected = false
-	if actual := UnsafeSquare(0); expected != actual {
-		t.Errorf("UnsafeSquare(0) = %v, expected %v", actual, expected)
-	}
-	if actual := UnsafeSquare(63); expected != actual {
-		t.Errorf("UnsafeSquare(63) = %v, expected %v", actual, expected)
-	}
-	expected = true
-	if actual := UnsafeSquare(64); expected != actual {
-		t.Errorf("UnsafeSquare(64) = %v, expected %v", actual, expected)
+	if actual := SafeSquare(64); expected != actual {
+		t.Errorf("SafeSquare(64) = %v, expected %v", actual, expected)
 	}
 }
 
 func TestUnsafeDim(t *testing.T) {
 	expected := true
-	if actual := UnsafeDim(-1); expected != actual {
-		t.Errorf("UnsafeDim(-1) = %v, expected %v", actual, expected)
+	if actual := SafeDim(0); expected != actual {
+		t.Errorf("SafeDim(0) = %v, expected %v", actual, expected)
+	}
+	if actual := SafeDim(7); expected != actual {
+		t.Errorf("SafeDim(7) = %v, expected %v", actual, expected)
 	}
 	expected = false
-	if actual := UnsafeDim(0); expected != actual {
-		t.Errorf("UnsafeDim(0) = %v, expected %v", actual, expected)
-	}
-	if actual := UnsafeDim(7); expected != actual {
-		t.Errorf("UnsafeDim(7) = %v, expected %v", actual, expected)
-	}
-	expected = true
-	if actual := UnsafeDim(8); expected != actual {
-		t.Errorf("UnsafeDim(8) = %v, expected %v", actual, expected)
+	if actual := SafeDim(8); expected != actual {
+		t.Errorf("SafeDim(8) = %v, expected %v", actual, expected)
 	}
 }
 
 func TestFileOf(t *testing.T) {
-	// UnsafeSquare already tested, only checking happy paths
-	expected := 0
+	// SafeSquare already tested, only checking happy paths
+	expected := uint64(0)
 	if actual := FileOf(8); expected != actual {
 		t.Errorf("FileOf(8) = %v, expected %v", actual, expected)
 	}
@@ -90,7 +76,7 @@ func TestFileOf(t *testing.T) {
 
 func TestRankOf(t *testing.T) {
 	// UnsafeSquare already tested, only checking happy paths
-	expected := 0
+	expected := uint64(0)
 	if actual := RankOf(1); expected != actual {
 		t.Errorf("RankOf(1) = %v, expected %v", actual, expected)
 	}
@@ -109,7 +95,7 @@ func TestRankOf(t *testing.T) {
 
 func TestSquareFrom(t *testing.T) {
 	// UnsafeDim already tested, only checking happy paths
-	expected := 0
+	expected := uint64(0)
 	if actual := SquareFrom(0, 0); expected != actual {
 		t.Errorf("SquareFrom(0, 0) = %v, expected %v", actual, expected)
 	}
@@ -129,8 +115,8 @@ func TestSquareFrom(t *testing.T) {
 
 func TestTestBit(t *testing.T) {
 	// UnsafeSquare already tested, only checking happy paths
-	bitboard := RANK_1
-	for square := 0; square < 64; square++ {
+	bitboard := RANK_8
+	for square := uint64(0); square < 64; square++ {
 		expected := true
 		if square >= 8 {
 			expected = false
@@ -139,8 +125,8 @@ func TestTestBit(t *testing.T) {
 			t.Errorf("TestBit(0x%016x, %d) = %v, expected %v", bitboard, square, actual, expected)
 		}
 	}
-	bitboard = RANK_2
-	for square := 0; square < 64; square++ {
+	bitboard = RANK_7
+	for square := uint64(0); square < 64; square++ {
 		expected := true
 		if square < 8 || square >= 16 {
 			expected = false
@@ -152,7 +138,7 @@ func TestTestBit(t *testing.T) {
 }
 
 func TestSetBit(t *testing.T) {
-	expected := RANK_1
+	expected := RANK_8
 	pre := uint64(0x00000000000000bf)
 	actual := pre
 	if SetBit(&actual, 6); expected != actual {
@@ -167,7 +153,7 @@ func TestSetBit(t *testing.T) {
 }
 
 func TestFlipBit(t *testing.T) {
-	expected := RANK_1
+	expected := RANK_8
 	pre := uint64(0x00000000000000bf)
 	actual := pre
 	if FlipBit(&actual, 6); expected != actual {
@@ -183,7 +169,7 @@ func TestFlipBit(t *testing.T) {
 
 func TestCountBits(t *testing.T) {
 	bitboard := uint64(5)
-	expected := 2
+	expected := uint64(2)
 	if actual := CountBits(bitboard); expected != actual {
 		t.Errorf("CountBits(0x%016x) = 0x%016x, expected 0x%016x", bitboard, actual, expected)
 	}
@@ -194,26 +180,26 @@ func TestCountBits(t *testing.T) {
 	}
 }
 
-func TestMSBIndex(t *testing.T) {
+func TestLSBIndex(t *testing.T) {
 	bitboard := uint64(0)
-	expected := -1
-	if actual := MSBIndex(bitboard); expected != actual {
-		t.Errorf("MSBIndex(0x%016x) = %v, expected %v", bitboard, actual, expected)
+	expected := uint64(64)
+	if actual := LSBIndex(bitboard); expected != actual {
+		t.Errorf("LSBIndex(0x%016x) = %v, expected %v", bitboard, actual, expected)
 	}
-	bitboard = uint64(1)<<63 + (uint64(1)<<63 - 1)
-	expected = 0
-	if actual := MSBIndex(bitboard); expected != actual {
-		t.Errorf("MSBIndex(0x%016x) = %v, expected %v", bitboard, actual, expected)
-	}
-	bitboard = uint64(1)
+	bitboard = uint64(1) << 63
 	expected = 63
-	if actual := MSBIndex(bitboard); expected != actual {
-		t.Errorf("MSBIndex(0x%016x) = %v, expected %v", bitboard, actual, expected)
+	if actual := LSBIndex(bitboard); expected != actual {
+		t.Errorf("LSBIndex(0x%016x) = %v, expected %v", bitboard, actual, expected)
+	}
+	bitboard = uint64(1) << 1
+	expected = 1
+	if actual := LSBIndex(bitboard); expected != actual {
+		t.Errorf("LSBIndex(0x%016x) = %v, expected %v", bitboard, actual, expected)
 	}
 	bitboard = uint64(7)
-	expected = 61
-	if actual := MSBIndex(bitboard); expected != actual {
-		t.Errorf("MSBIndex(0x%016x) = %v, expected %v", bitboard, actual, expected)
+	expected = 0
+	if actual := LSBIndex(bitboard); expected != actual {
+		t.Errorf("LSBIndex(0x%016x) = %v, expected %v", bitboard, actual, expected)
 	}
 }
 

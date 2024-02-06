@@ -8,12 +8,33 @@ type pair struct {
 	col int
 }
 
+var BishopOccupancyCounts [64]uint64 = [64]uint64{
+	6, 5, 5, 5, 5, 5, 5, 6,
+	5, 5, 5, 5, 5, 5, 5, 5,
+	5, 5, 7, 7, 7, 7, 5, 5,
+	5, 5, 7, 9, 9, 7, 5, 5,
+	5, 5, 7, 9, 9, 7, 5, 5,
+	5, 5, 7, 7, 7, 7, 5, 5,
+	5, 5, 5, 5, 5, 5, 5, 5,
+	6, 5, 5, 5, 5, 5, 5, 6,
+}
+var RookOccupancyCounts [64]uint64 = [64]uint64{
+	12, 11, 11, 11, 11, 11, 11, 12,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	12, 11, 11, 11, 11, 11, 11, 12,
+}
+
 var PawnAttacks [2][64]uint64
 var KnightAttacks [64]uint64
 var KingAttacks [64]uint64
 
 func InitAttacks() {
-	for square := 0; square < 64; square++ {
+	for square := uint64(0); square < 64; square++ {
 		PawnAttacks[WHITE][square] = MaskPawnAttacks(WHITE, square)
 		PawnAttacks[BLACK][square] = MaskPawnAttacks(BLACK, square)
 		KnightAttacks[square] = MaskKnightAttacks(square)
@@ -21,16 +42,16 @@ func InitAttacks() {
 	}
 }
 
-func MaskPawnAttacks(side int, square int) uint64 {
+func MaskPawnAttacks(side uint64, square uint64) uint64 {
 	attacks := uint64(0)
 	bitboard := uint64(0)
 	SetBit(&bitboard, square)
 	if side == WHITE {
-		attacks |= bitboard << 7
-		attacks |= bitboard << 9
-	} else {
 		attacks |= bitboard >> 7
 		attacks |= bitboard >> 9
+	} else {
+		attacks |= bitboard << 7
+		attacks |= bitboard << 9
 	}
 	if bitboard&NOT_A == 0 { // pawn is on A file
 		attacks &= NOT_H
@@ -40,7 +61,7 @@ func MaskPawnAttacks(side int, square int) uint64 {
 	return attacks
 }
 
-func MaskKnightAttacks(square int) uint64 {
+func MaskKnightAttacks(square uint64) uint64 {
 	attacks := uint64(0)
 	bitboard := uint64(0)
 	SetBit(&bitboard, square)
@@ -60,7 +81,7 @@ func MaskKnightAttacks(square int) uint64 {
 	return attacks
 }
 
-func MaskKingAttacks(square int) uint64 {
+func MaskKingAttacks(square uint64) uint64 {
 	attacks := uint64(0)
 	bitboard := uint64(0)
 	SetBit(&bitboard, square)
@@ -80,100 +101,141 @@ func MaskKingAttacks(square int) uint64 {
 	return attacks
 }
 
-func BishopRays(square int, edges bool, occupied uint64) uint64 {
+func BishopRays(square uint64, edges bool, occupied uint64) uint64 {
 	rays := uint64(0)
-	lo := 1
-	hi := 6
-	if edges {
-		lo = 0
-		hi = 7
-	}
-	rank := RankOf(square)
-	file := FileOf(square)
-	for r, f := rank+1, file+1; r <= hi && f <= hi; r, f = r+1, f+1 {
-		bit := uint64(1) << uint(r*8+f)
+	r, f := RankOf(square)+1, FileOf(square)+1
+	for SafeCoord(r, f) {
+		if !edges && !SafeCoord(r+1, f+1) {
+			break
+		}
+		bit := uint64(1) << uint64(SquareFrom(r, f))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
+		r += 1
+		f += 1
 	}
-	for r, f := rank+1, file-1; r <= hi && f >= lo; r, f = r+1, f-1 {
-		bit := uint64(1) << uint(r*8+f)
+	r, f = RankOf(square)+1, FileOf(square)-1
+	for SafeCoord(r, f) {
+		if !edges && !SafeCoord(r+1, f-1) {
+			break
+		}
+		bit := uint64(1) << uint64(SquareFrom(r, f))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
+		r += 1
+		f -= 1
 	}
-	for r, f := rank-1, file+1; r >= lo && f <= hi; r, f = r-1, f+1 {
-		bit := uint64(1) << uint(r*8+f)
+	r, f = RankOf(square)-1, FileOf(square)+1
+	for SafeCoord(r, f) {
+		if !edges && !SafeCoord(r-1, f+1) {
+			break
+		}
+		bit := uint64(1) << uint64(SquareFrom(r, f))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
+		r -= 1
+		f += 1
 	}
-	for r, f := rank-1, file-1; r >= lo && f >= lo; r, f = r-1, f-1 {
-		bit := uint64(1) << uint(r*8+f)
+	r = RankOf(square) - 1
+	f = FileOf(square) - 1
+	for SafeCoord(r, f) {
+		if !edges && !SafeCoord(r-1, f-1) {
+			break
+		}
+		bit := uint64(1) << uint64(SquareFrom(r, f))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
+		r -= 1
+		f -= 1
 	}
 	return rays
 }
 
-func RelevantBishopOccupants(square int) uint64 {
+func RelevantBishopOccupants(square uint64) uint64 {
 	return BishopRays(square, false, 0)
 }
 
-func MaskBishopAttacks(square int, occupied uint64) uint64 {
+func MaskBishopAttacks(square uint64, occupied uint64) uint64 {
 	return BishopRays(square, true, occupied)
 }
 
-func RookRays(square int, edges bool, occupied uint64) uint64 {
+func RookRays(square uint64, edges bool, occupied uint64) uint64 {
 	rays := uint64(0)
-	lo := 1
-	hi := 6
-	if edges {
-		lo = 0
-		hi = 7
-	}
-	rank := RankOf(square)
-	file := FileOf(square)
-	for r := rank - 1; r >= lo; r-- {
-		bit := uint64(1) << uint(r*8+file)
+	rank, file := RankOf(square)-1, FileOf(square)
+	for SafeCoord(rank, file) {
+		if !edges && !SafeCoord(rank-1, file) {
+			break
+		}
+		bit := uint64(1) << uint64(SquareFrom(rank, file))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
+		rank -= 1
 	}
-	for r := rank + 1; r <= hi; r++ {
-		bit := uint64(1) << uint(r*8+file)
+	rank = RankOf(square) + 1
+	for SafeCoord(rank, file) {
+		if !edges && !SafeCoord(rank+1, file) {
+			break
+		}
+		bit := uint64(1) << uint64(SquareFrom(rank, file))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
+		rank += 1
 	}
-	for f := file - 1; f >= lo; f-- {
-		bit := uint64(1) << uint(rank*8+f)
+	rank, file = RankOf(square), FileOf(square)-1
+	for SafeCoord(rank, file) {
+		if !edges && !SafeCoord(rank, file-1) {
+			break
+		}
+		bit := uint64(1) << uint64(SquareFrom(rank, file))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
+		file -= 1
 	}
-	for f := file + 1; f <= hi; f++ {
-		bit := uint64(1) << uint(rank*8+f)
+	file = FileOf(square) + 1
+	for SafeCoord(rank, file) {
+		if !edges && !SafeCoord(rank, file+1) {
+			break
+		}
+		bit := uint64(1) << uint64(SquareFrom(rank, file))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
+		file += 1
 	}
 	return rays
 }
 
-func RelevantRookOccupants(square int) uint64 {
+func RelevantRookOccupants(square uint64) uint64 {
 	return RookRays(square, false, 0)
 }
 
-func MaskRookAttacks(square int, occupied uint64) uint64 {
+func MaskRookAttacks(square uint64, occupied uint64) uint64 {
 	return RookRays(square, true, occupied)
+}
+
+func SetOccupancy(index uint64, bits uint64, attack_mask uint64) uint64 {
+	occupancy := uint64(0)
+	for count := uint64(0); count < bits; count++ {
+		square := LSBIndex(attack_mask)
+		PopBit(&attack_mask, square)
+		if index&(1<<count) != 0 {
+			occupancy |= 1 << square
+		}
+	}
+	return occupancy
 }
