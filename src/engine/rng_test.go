@@ -2,6 +2,14 @@ package engine
 
 import "testing"
 
+func TestNewRNG(t *testing.T) {
+	r := NewRNG()
+	expected := uint32(1804289383)
+	if actual := r.random_state; expected != actual {
+		t.Errorf("NewRNG() random_state should be 0x%016x but is 0x%016x", expected, actual)
+	}
+}
+
 func TestXORRand(t *testing.T) {
 	r := NewRNG()
 	expected := uint32(0x0000000067d33a74)
