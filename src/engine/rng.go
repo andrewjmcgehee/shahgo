@@ -4,8 +4,8 @@ type RNG struct {
 	random_state uint32
 }
 
-func NewRNG() RNG {
-	return RNG{random_state: 1804289383}
+func NewRNG() *RNG {
+	return &RNG{random_state: 1804289383}
 }
 
 func (r *RNG) XORRand() uint32 {
@@ -25,9 +25,4 @@ func (r *RNG) Rand() uint64 {
 	c := uint64(r.XORRand()) & mask
 	d := uint64(r.XORRand()) & mask
 	return a | b<<16 | c<<32 | d<<48
-}
-
-func (r *RNG) MagicCandidate() uint64 {
-	// has the effect of reducing the number of 1 bits
-	return r.Rand() & r.Rand() & r.Rand()
 }

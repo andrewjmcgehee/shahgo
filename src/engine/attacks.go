@@ -228,9 +228,9 @@ func MaskRookAttacks(square uint64, occupied uint64) uint64 {
 	return RookRays(square, true, occupied)
 }
 
-func SetOccupancy(index uint64, bits uint64, attack_mask uint64) uint64 {
+func SetOccupancy(index uint64, relevant_bits uint64, attack_mask uint64) uint64 {
 	occupancy := uint64(0)
-	for count := uint64(0); count < bits; count++ {
+	for count := uint64(0); count < relevant_bits; count++ {
 		square := LSBIndex(attack_mask)
 		PopBit(&attack_mask, square)
 		if index&(1<<count) != 0 {
