@@ -9,6 +9,7 @@ func NewRNG() RNG {
 }
 
 func (r *RNG) XORRand() uint32 {
+	// XOR shift algorithm https://en.wikipedia.org/wiki/Xorshift#Example_implementation
 	next := r.random_state
 	next ^= next << 13
 	next ^= next >> 17
@@ -18,13 +19,15 @@ func (r *RNG) XORRand() uint32 {
 }
 
 func (r *RNG) Rand() uint64 {
-	mask := uint32(0xffff)
-	return (uint64(r.XORRand()&mask) |
-		uint64(r.XORRand()&mask)<<16 |
-		uint64(r.XORRand()&mask)<<32 |
-		uint64(r.XORRand()&mask)<<48)
+	mask := uint64(0xffff)
+	a := uint64(r.XORRand()) & mask
+	b := uint64(r.XORRand()) & mask
+	c := uint64(r.XORRand()) & mask
+	d := uint64(r.XORRand()) & mask
+	return a | b<<16 | c<<32 | d<<48
 }
 
 func (r *RNG) MagicCandidate() uint64 {
+	// has the effect of reducing the number of 1 bits
 	return r.Rand() & r.Rand() & r.Rand()
 }
