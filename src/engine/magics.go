@@ -15,16 +15,16 @@ func find_magic(square uint64, relevant_bits uint64, rook bool) uint64 {
 	var used_attacks [4096]uint64
 	var attack_mask uint64
 	if rook {
-		attack_mask = RelevantRookOccupants(square)
+		attack_mask = MaskRookAttacks(square)
 	} else {
-		attack_mask = RelevantBishopOccupants(square)
+		attack_mask = MaskBishopAttacks(square)
 	}
 	for i := uint64(0); i < 1<<relevant_bits; i++ {
 		occupancies[i] = SetOccupancy(i, relevant_bits, attack_mask)
 		if rook {
-			attacks[i] = MaskRookAttacks(square, occupancies[i])
+			attacks[i] = MaskRookAttacksWithOccupancy(square, occupancies[i])
 		} else {
-			attacks[i] = MaskBishopAttacks(square, occupancies[i])
+			attacks[i] = MaskBishopAttacksWithOccupancy(square, occupancies[i])
 		}
 	}
 	for random := uint64(0); random < 100000000; random++ {
@@ -57,11 +57,11 @@ func InitMagics() {
 	}
 	// rook magics
 	for square := uint64(0); square < 64; square++ {
-		fmt.Printf("  0x%016x\n", find_magic(square, RookOccupancyCounts[square], true))
+		fmt.Printf("  0x%016x\n", find_magic(square, getRookOccupancyCounts()[square], true))
 	}
 	fmt.Println()
 	// bishop magics
 	for square := uint64(0); square < 64; square++ {
-		fmt.Printf("  0x%016x\n", find_magic(square, BishopOccupancyCounts[square], false))
+		fmt.Printf("  0x%016x\n", find_magic(square, getBishopOccupancyCounts()[square], false))
 	}
 }

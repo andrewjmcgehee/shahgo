@@ -8,37 +8,52 @@ type pair struct {
 	col int
 }
 
-var BishopOccupancyCounts [64]uint64 = [64]uint64{
-	6, 5, 5, 5, 5, 5, 5, 6,
-	5, 5, 5, 5, 5, 5, 5, 5,
-	5, 5, 7, 7, 7, 7, 5, 5,
-	5, 5, 7, 9, 9, 7, 5, 5,
-	5, 5, 7, 9, 9, 7, 5, 5,
-	5, 5, 7, 7, 7, 7, 5, 5,
-	5, 5, 5, 5, 5, 5, 5, 5,
-	6, 5, 5, 5, 5, 5, 5, 6,
-}
-var RookOccupancyCounts [64]uint64 = [64]uint64{
-	12, 11, 11, 11, 11, 11, 11, 12,
-	11, 10, 10, 10, 10, 10, 10, 11,
-	11, 10, 10, 10, 10, 10, 10, 11,
-	11, 10, 10, 10, 10, 10, 10, 11,
-	11, 10, 10, 10, 10, 10, 10, 11,
-	11, 10, 10, 10, 10, 10, 10, 11,
-	11, 10, 10, 10, 10, 10, 10, 11,
-	12, 11, 11, 11, 11, 11, 11, 12,
-}
-
 var PawnAttacks [2][64]uint64
 var KnightAttacks [64]uint64
 var KingAttacks [64]uint64
+var BishopMasks [64]uint64
+var BishopAttacks [64][512]uint64
+var RookMasks [64]uint64
+var RookAttacks [64][4096]uint64
 
 func InitAttacks() {
+	InitLeaperAttacks()
+	InitSliderAttacks(false) // bishops
+	InitSliderAttacks(true)  // rooks
+}
+
+func InitLeaperAttacks() {
 	for square := uint64(0); square < 64; square++ {
 		PawnAttacks[WHITE][square] = MaskPawnAttacks(WHITE, square)
 		PawnAttacks[BLACK][square] = MaskPawnAttacks(BLACK, square)
 		KnightAttacks[square] = MaskKnightAttacks(square)
 		KingAttacks[square] = MaskKingAttacks(square)
+	}
+}
+
+func InitSliderAttacks(rook bool) {
+	var attack_mask uint64
+	var relevant_bits uint64
+	for square := uint64(0); square < 64; square++ {
+		if rook {
+			RookMasks[square] = MaskRookAttacks(square)
+			attack_mask = RookMasks[square]
+			relevant_bits = CountBits(attack_mask)
+		} else {
+			BishopMasks[square] = MaskBishopAttacks(square)
+			attack_mask = BishopMasks[square]
+			relevant_bits = CountBits(attack_mask)
+		}
+		for i := uint64(0); i < 1<<relevant_bits; i++ {
+			occupied := SetOccupancy(i, relevant_bits, attack_mask)
+			if rook {
+				magic_index := (occupied * getRookMagics()[square]) >> (64 - getRookOccupancyCounts()[square])
+				RookAttacks[square][magic_index] = MaskRookAttacksWithOccupancy(square, occupied)
+			} else {
+				magic_index := (occupied * getBishopMagics()[square]) >> (64 - getBishopOccupancyCounts()[square])
+				BishopAttacks[square][magic_index] = MaskBishopAttacksWithOccupancy(square, occupied)
+			}
+		}
 	}
 }
 
@@ -159,12 +174,19 @@ func BishopRays(square uint64, edges bool, occupied uint64) uint64 {
 	return rays
 }
 
-func RelevantBishopOccupants(square uint64) uint64 {
+func MaskBishopAttacks(square uint64) uint64 {
 	return BishopRays(square, false, 0)
 }
 
-func MaskBishopAttacks(square uint64, occupied uint64) uint64 {
+func MaskBishopAttacksWithOccupancy(square uint64, occupied uint64) uint64 {
 	return BishopRays(square, true, occupied)
+}
+
+func GetBishopAttacks(square uint64, occupied uint64) uint64 {
+	occupied &= BishopMasks[square]
+	occupied *= getBishopMagics()[square]
+	occupied >>= 64 - getBishopOccupancyCounts()[square]
+	return BishopAttacks[square][occupied]
 }
 
 func RookRays(square uint64, edges bool, occupied uint64) uint64 {
@@ -220,22 +242,29 @@ func RookRays(square uint64, edges bool, occupied uint64) uint64 {
 	return rays
 }
 
-func RelevantRookOccupants(square uint64) uint64 {
+func MaskRookAttacks(square uint64) uint64 {
 	return RookRays(square, false, 0)
 }
 
-func MaskRookAttacks(square uint64, occupied uint64) uint64 {
+func MaskRookAttacksWithOccupancy(square uint64, occupied uint64) uint64 {
 	return RookRays(square, true, occupied)
 }
 
+func GetRookAttacks(square uint64, occupied uint64) uint64 {
+	occupied &= RookMasks[square]
+	occupied *= getRookMagics()[square]
+	occupied >>= 64 - getRookOccupancyCounts()[square]
+	return RookAttacks[square][occupied]
+}
+
 func SetOccupancy(index uint64, relevant_bits uint64, attack_mask uint64) uint64 {
-	occupancy := uint64(0)
+	occupied := uint64(0)
 	for count := uint64(0); count < relevant_bits; count++ {
 		square := LSBIndex(attack_mask)
 		PopBit(&attack_mask, square)
 		if index&(1<<count) != 0 {
-			occupancy |= 1 << square
+			occupied |= 1 << square
 		}
 	}
-	return occupancy
+	return occupied
 }

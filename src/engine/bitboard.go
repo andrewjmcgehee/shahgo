@@ -100,7 +100,7 @@ func Display(bitboard uint64, stdout bool) string {
 	repr += "\n   a b c d e f g h"
 	if stdout {
 		fmt.Println(repr)
-		fmt.Printf("\n   0x%016x\n", bitboard)
+		fmt.Printf("\n   0x%016x\n\n", bitboard)
 	}
 	return repr
 }

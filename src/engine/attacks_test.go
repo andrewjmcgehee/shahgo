@@ -102,11 +102,11 @@ func TestMaskKingAttacks(t *testing.T) {
 func TestBishopRays(t *testing.T) {
 	expected := uint64(0x0182442800284482)
 	if actual := BishopRays(E5, true, 0); expected != actual {
-		t.Errorf("BishopRays(E5, true) = 0x%016x, expected 0x%016x", actual, expected)
+		t.Errorf("BishopRays(E5, true, 0) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x0002442800284400)
 	if actual := BishopRays(E5, false, 0); expected != actual {
-		t.Errorf("BishopRays(E5, false) = 0x%016x, expected 0x%016x", actual, expected)
+		t.Errorf("BishopRays(E5, false, 0) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	blocker := uint64(0)
 	SetBit(&blocker, C3)
@@ -117,45 +117,45 @@ func TestBishopRays(t *testing.T) {
 	}
 }
 
-func TestRelevantBishopOccupants(t *testing.T) {
+func TestMaskBishopAttacks(t *testing.T) {
 	expected := uint64(0x0040201008040200)
-	if actual := RelevantBishopOccupants(A8); expected != actual {
-		t.Errorf("RelevantBishopOccupants(A8) = 0x%016x, expected 0x%016x", actual, expected)
+	if actual := MaskBishopAttacks(A8); expected != actual {
+		t.Errorf("MaskBishopAttacks(A8) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x0008040200020400)
-	if actual := RelevantBishopOccupants(A5); expected != actual {
-		t.Errorf("RelevantBishopOccupants(A5) = 0x%016x, expected 0x%016x", actual, expected)
+	if actual := MaskBishopAttacks(A5); expected != actual {
+		t.Errorf("MaskBishopAttacks(A5) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x0010080400040800)
-	if actual := RelevantBishopOccupants(B5); expected != actual {
-		t.Errorf("RelevantBishopOccupants(B5) = 0x%016x, expected 0x%016x", actual, expected)
+	if actual := MaskBishopAttacks(B5); expected != actual {
+		t.Errorf("MaskBishopAttacks(B5) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x0002442800284400)
-	if actual := RelevantBishopOccupants(E5); expected != actual {
-		t.Errorf("RelevantBishopOccupants(E5) = 0x%016x, expected 0x%016x", actual, expected)
+	if actual := MaskBishopAttacks(E5); expected != actual {
+		t.Errorf("MaskBishopAttacks(E5) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x0008102000201000)
-	if actual := RelevantBishopOccupants(G5); expected != actual {
-		t.Errorf("RelevantBishopOccupants(G5) = 0x%016x, expected 0x%016x", actual, expected)
+	if actual := MaskBishopAttacks(G5); expected != actual {
+		t.Errorf("MaskBishopAttacks(G5) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x0010204000402000)
-	if actual := RelevantBishopOccupants(H5); expected != actual {
+	if actual := MaskBishopAttacks(H5); expected != actual {
 		t.Errorf("MaskBishopAttacks(H5) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x0040201008040200)
-	if actual := RelevantBishopOccupants(H1); expected != actual {
-		t.Errorf("RelevantBishopOccupants(H1) = 0x%016x, expected 0x%016x", actual, expected)
+	if actual := MaskBishopAttacks(H1); expected != actual {
+		t.Errorf("MaskBishopAttacks(H1) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 }
 
 func TestRookRays(t *testing.T) {
 	expected := uint64(0x10101010ef101010)
 	if actual := RookRays(E5, true, 0); expected != actual {
-		t.Errorf("RookRays(E5, true) = 0x%016x, expected 0x%016x", actual, expected)
+		t.Errorf("RookRays(E5, true, 0) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x001010106e101000)
 	if actual := RookRays(E5, false, 0); expected != actual {
-		t.Errorf("RookRays(E5, false) = 0x%016x, expected 0x%016x", actual, expected)
+		t.Errorf("RookRays(E5, false, 0) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	blocker := uint64(0)
 	SetBit(&blocker, C3)
@@ -166,34 +166,34 @@ func TestRookRays(t *testing.T) {
 	}
 }
 
-func TestRelevantRookOccupants(t *testing.T) {
+func TestMaskRookAttacks(t *testing.T) {
 	expected := uint64(0x000101010101017e)
-	if actual := RelevantRookOccupants(A8); expected != actual {
-		t.Errorf("RelevantRookOccupants(A8) = 0x%016x, expected 0x%016x", actual, expected)
+	if actual := MaskRookAttacks(A8); expected != actual {
+		t.Errorf("MaskRookAttacks(A8) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x000101017e010100)
-	if actual := RelevantRookOccupants(A5); expected != actual {
-		t.Errorf("RelevantRookOccupants(A5) = 0x%016x, expected 0x%016x", actual, expected)
+	if actual := MaskRookAttacks(A5); expected != actual {
+		t.Errorf("MaskRookAttacks(A5) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x000202027c020200)
-	if actual := RelevantRookOccupants(B5); expected != actual {
-		t.Errorf("RelevantRookOccupants(B5) = 0x%016x, expected 0x%016x", actual, expected)
+	if actual := MaskRookAttacks(B5); expected != actual {
+		t.Errorf("MaskRookAttacks(B5) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x001010106e101000)
-	if actual := RelevantRookOccupants(E5); expected != actual {
-		t.Errorf("RelevantRookOccupants(E5) = 0x%016x, expected 0x%016x", actual, expected)
+	if actual := MaskRookAttacks(E5); expected != actual {
+		t.Errorf("MaskRookAttacks(E5) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x004040403e404000)
-	if actual := RelevantRookOccupants(G5); expected != actual {
-		t.Errorf("RelevantRookOccupants(G5) = 0x%016x, expected 0x%016x", actual, expected)
+	if actual := MaskRookAttacks(G5); expected != actual {
+		t.Errorf("MaskRookAttacks(G5) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x008080807e808000)
-	if actual := RelevantRookOccupants(H5); expected != actual {
-		t.Errorf("RelevantRookOccupants(H5) = 0x%016x, expected 0x%016x", actual, expected)
+	if actual := MaskRookAttacks(H5); expected != actual {
+		t.Errorf("MaskRookAttacks(H5) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 	expected = uint64(0x7e80808080808000)
-	if actual := RelevantRookOccupants(H1); expected != actual {
-		t.Errorf("RelevantRookOccupants(H1) = 0x%016x, expected 0x%016x", actual, expected)
+	if actual := MaskRookAttacks(H1); expected != actual {
+		t.Errorf("MaskRookAttacks(H1) = 0x%016x, expected 0x%016x", actual, expected)
 	}
 }
 
