@@ -19,7 +19,7 @@ func main() {
 	engine.Move(b, engine.Pawn, engine.F7, engine.F5)
 	engine.Move(b, engine.Pawn, engine.C2, engine.C4)
 	engine.Move(b, engine.Pawn, engine.F5, engine.F4)
-	engine.DisplayBitboard(engine.MaskRookAttacksWithOccupancy(engine.C1, b.OccupancyBitboards[engine.Both]), true)
+	engine.DisplayBitboard(engine.MaskBishopAttacksWithOccupancy(engine.C1, b.OccupancyBitboards[engine.Both]), true)
 
 	if b.OccupancyBitboards[engine.Both] != b.OccupancyBitboards[engine.White]|b.OccupancyBitboards[engine.Black] {
 		panic("blah")
