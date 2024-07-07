@@ -3,213 +3,176 @@ package engine
 import "testing"
 
 func TestMaskPawnAttacks(t *testing.T) {
-	expected := uint64(0x0002000000000000)
-	if actual := MaskPawnAttacks(WHITE, A1); expected != actual {
-		t.Errorf("MaskPawnAttacks(WHITE, A1) = 0x%016x, expected 0x%016x", actual, expected)
+	cases := map[string]struct {
+		turn     int
+		square   int
+		expected uint64
+	}{
+		"a1 white to move": {White, A1, uint64(0x0002000000000000)},
+		"a1 black to move": {Black, A1, uint64(0x0000000000000000)},
+		"a4 white to move": {White, A4, uint64(0x0000000002000000)},
+		"a4 black to move": {Black, A4, uint64(0x0000020000000000)},
+		"e4 white to move": {White, E4, uint64(0x0000000028000000)},
+		"e4 black to move": {Black, E4, uint64(0x0000280000000000)},
+		"h4 white to move": {White, H4, uint64(0x0000000040000000)},
+		"h4 black to move": {Black, H4, uint64(0x0000400000000000)},
+		"h8 white to move": {White, H8, uint64(0x0000000000000000)},
+		"h8 black to move": {Black, H8, uint64(0x0000000000004000)},
 	}
-	expected = uint64(0x0000000000000000)
-	if actual := MaskPawnAttacks(BLACK, A1); expected != actual {
-		t.Errorf("MaskPawnAttacks(BLACK, A1) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0000000002000000)
-	if actual := MaskPawnAttacks(WHITE, A4); expected != actual {
-		t.Errorf("MaskPawnAttacks(WHITE, A4) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0000020000000000)
-	if actual := MaskPawnAttacks(BLACK, A4); expected != actual {
-		t.Errorf("MaskPawnAttacks(BLACK, A4) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0000000028000000)
-	if actual := MaskPawnAttacks(WHITE, E4); expected != actual {
-		t.Errorf("MaskPawnAttacks(WHITE, E4) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0000280000000000)
-	if actual := MaskPawnAttacks(BLACK, E4); expected != actual {
-		t.Errorf("MaskPawnAttacks(BLACK, E4) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0000000040000000)
-	if actual := MaskPawnAttacks(WHITE, H4); expected != actual {
-		t.Errorf("MaskPawnAttacks(WHITE, H4) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0000400000000000)
-	if actual := MaskPawnAttacks(BLACK, H4); expected != actual {
-		t.Errorf("MaskPawnAttacks(BLACK, H4) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0000000000000000)
-	if actual := MaskPawnAttacks(WHITE, H8); expected != actual {
-		t.Errorf("MaskPawnAttacks(WHITE, H8) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0000000000004000)
-	if actual := MaskPawnAttacks(BLACK, H8); expected != actual {
-		t.Errorf("MaskPawnAttacks(BLACK, H8) = 0x%016x, expected 0x%016x", actual, expected)
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			if actual := MaskPawnAttacks(tc.turn, tc.square); tc.expected != actual {
+				t.Errorf("MaskPawnAttacks(%v, %v) = 0x%016x, expected 0x%016x",
+					humanReadbleTurn(tc.turn), humanReadbleSquare(tc.square), actual, tc.expected)
+			}
+		})
 	}
 }
 
 func TestMaskKnightAttacks(t *testing.T) {
-	expected := uint64(0x0000000000020400)
-	if actual := MaskKnightAttacks(A8); expected != actual {
-		t.Errorf("MaskKnightAttacks(A8) = 0x%016x, expected 0x%016x", actual, expected)
+	cases := map[string]struct {
+		square   int
+		expected uint64
+	}{
+		"a8": {A8, uint64(0x0000000000020400)},
+		"a5": {A5, uint64(0x0000020400040200)},
+		"b5": {B5, uint64(0x0000050800080500)},
+		"e5": {E5, uint64(0x0000284400442800)},
+		"g5": {G5, uint64(0x0000a0100010a000)},
+		"h5": {H5, uint64(0x0000402000204000)},
+		"h1": {H1, uint64(0x0020400000000000)},
 	}
-	expected = uint64(0x0000020400040200)
-	if actual := MaskKnightAttacks(A5); expected != actual {
-		t.Errorf("MaskKnightAttacks(A5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0000050800080500)
-	if actual := MaskKnightAttacks(B5); expected != actual {
-		t.Errorf("MaskKnightAttacks(B5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0000284400442800)
-	if actual := MaskKnightAttacks(E5); expected != actual {
-		t.Errorf("MaskKnightAttacks(E5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0000a0100010a000)
-	if actual := MaskKnightAttacks(G5); expected != actual {
-		t.Errorf("MaskKnightAttacks(G5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0000402000204000)
-	if actual := MaskKnightAttacks(H5); expected != actual {
-		t.Errorf("MaskKnightAttacks(H5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0020400000000000)
-	if actual := MaskKnightAttacks(H1); expected != actual {
-		t.Errorf("MaskKnightAttacks(H1) = 0x%016x, expected 0x%016x", actual, expected)
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			if actual := MaskKnightAttacks(tc.square); tc.expected != actual {
+				t.Errorf("MaskKnightAttacks(%v) = 0x%016x, expected 0x%016x", humanReadbleSquare(tc.square), actual, tc.expected)
+			}
+		})
 	}
 }
 
 func TestMaskKingAttacks(t *testing.T) {
-	expected := uint64(0x0000000000000302)
-	if actual := MaskKingAttacks(A8); expected != actual {
-		t.Errorf("MaskKingAttacks(A8) = 0x%016x, expected 0x%016x", actual, expected)
+	cases := map[string]struct {
+		square   int
+		expected uint64
+	}{
+		"a8": {A8, uint64(0x0000000000000302)},
+		"a5": {A5, uint64(0x0000000302030000)},
+		"e5": {E5, uint64(0x0000003828380000)},
+		"h5": {H5, uint64(0x000000c040c00000)},
+		"h1": {H1, uint64(0x40c0000000000000)},
 	}
-	expected = uint64(0x0000000302030000)
-	if actual := MaskKingAttacks(A5); expected != actual {
-		t.Errorf("MaskKingAttacks(A5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0000003828380000)
-	if actual := MaskKingAttacks(E5); expected != actual {
-		t.Errorf("MaskKingAttacks(E5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x000000c040c00000)
-	if actual := MaskKingAttacks(H5); expected != actual {
-		t.Errorf("MaskKingAttacks(H5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x40c0000000000000)
-	if actual := MaskKingAttacks(H1); expected != actual {
-		t.Errorf("MaskKingAttacks(H1) = 0x%016x, expected 0x%016x", actual, expected)
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			if actual := MaskKingAttacks(tc.square); tc.expected != actual {
+				t.Errorf("MaskKingAttacks(%v) = 0x%016x, expected 0x%016x", humanReadbleSquare(tc.square), actual, tc.expected)
+			}
+		})
 	}
 }
 
 func TestBishopRays(t *testing.T) {
-	expected := uint64(0x0182442800284482)
-	if actual := BishopRays(E5, true, 0); expected != actual {
-		t.Errorf("BishopRays(E5, true, 0) = 0x%016x, expected 0x%016x", actual, expected)
+	cases := map[string]struct {
+		square   int
+		edges    bool
+		occupied uint64
+		expected uint64
+	}{
+		"E5 with edges":                 {E5, true, 0, uint64(0x0182442800284482)},
+		"E5 without edges":              {E5, false, 0, uint64(0x0002442800284400)},
+		"E5 with blockers on C3 and D6": {E5, true, 0x0000040000080000, uint64(0x0080442800284080)},
 	}
-	expected = uint64(0x0002442800284400)
-	if actual := BishopRays(E5, false, 0); expected != actual {
-		t.Errorf("BishopRays(E5, false, 0) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	blocker := uint64(0)
-	SetBit(&blocker, C3)
-	SetBit(&blocker, D6)
-	expected = uint64(0x0080442800284080)
-	if actual := BishopRays(E5, true, blocker); expected != actual {
-		t.Errorf("BishopRays(E5, true, 0x%016x) = 0x%016x, expected 0x%016x", blocker, actual, expected)
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			if actual := BishopRays(tc.square, tc.edges, tc.occupied); tc.expected != actual {
+				t.Errorf("BishopRays(%v, %v, 0x%016x) = 0x%016x, expected 0x%016x",
+					humanReadbleSquare(tc.square), tc.edges, tc.occupied, actual, tc.expected)
+			}
+		})
 	}
 }
 
 func TestMaskBishopAttacks(t *testing.T) {
-	expected := uint64(0x0040201008040200)
-	if actual := MaskBishopAttacks(A8); expected != actual {
-		t.Errorf("MaskBishopAttacks(A8) = 0x%016x, expected 0x%016x", actual, expected)
+	cases := map[string]struct {
+		square   int
+		expected uint64
+	}{
+		"A8": {A8, uint64(0x0040201008040200)},
+		"A5": {A5, uint64(0x0008040200020400)},
+		"B5": {B5, uint64(0x0010080400040800)},
+		"E5": {E5, uint64(0x0002442800284400)},
+		"G5": {G5, uint64(0x0008102000201000)},
+		"H5": {H5, uint64(0x0010204000402000)},
+		"H1": {H1, uint64(0x0040201008040200)},
 	}
-	expected = uint64(0x0008040200020400)
-	if actual := MaskBishopAttacks(A5); expected != actual {
-		t.Errorf("MaskBishopAttacks(A5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0010080400040800)
-	if actual := MaskBishopAttacks(B5); expected != actual {
-		t.Errorf("MaskBishopAttacks(B5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0002442800284400)
-	if actual := MaskBishopAttacks(E5); expected != actual {
-		t.Errorf("MaskBishopAttacks(E5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0008102000201000)
-	if actual := MaskBishopAttacks(G5); expected != actual {
-		t.Errorf("MaskBishopAttacks(G5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0010204000402000)
-	if actual := MaskBishopAttacks(H5); expected != actual {
-		t.Errorf("MaskBishopAttacks(H5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x0040201008040200)
-	if actual := MaskBishopAttacks(H1); expected != actual {
-		t.Errorf("MaskBishopAttacks(H1) = 0x%016x, expected 0x%016x", actual, expected)
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			if actual := MaskBishopAttacks(tc.square); tc.expected != actual {
+				t.Errorf("MaskBishopAttacks(%v) = 0x%016x, expected 0x%016x", humanReadbleSquare(tc.square), actual, tc.expected)
+			}
+		})
 	}
 }
 
 func TestRookRays(t *testing.T) {
-	expected := uint64(0x10101010ef101010)
-	if actual := RookRays(E5, true, 0); expected != actual {
-		t.Errorf("RookRays(E5, true, 0) = 0x%016x, expected 0x%016x", actual, expected)
+	cases := map[string]struct {
+		square   int
+		edges    bool
+		occupied uint64
+		expected uint64
+	}{
+		"E5 with edges":                 {E5, true, 0, uint64(0x10101010ef101010)},
+		"E5 without edges":              {E5, false, 0, uint64(0x001010106e101000)},
+		"D3 with blockers on C3 and D6": {D3, true, 0x0000040000080000, uint64(0x0808f40808080000)},
 	}
-	expected = uint64(0x001010106e101000)
-	if actual := RookRays(E5, false, 0); expected != actual {
-		t.Errorf("RookRays(E5, false, 0) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	blocker := uint64(0)
-	SetBit(&blocker, C3)
-	SetBit(&blocker, D6)
-	expected = uint64(0x0808f40808080000)
-	if actual := RookRays(D3, true, blocker); expected != actual {
-		t.Errorf("RookRays(D3, true, 0x%016x) = 0x%016x, expected 0x%016x", blocker, actual, expected)
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			if actual := RookRays(tc.square, tc.edges, tc.occupied); tc.expected != actual {
+				t.Errorf("RookRays(%v, %v, 0x%016x) = 0x%016x, expected 0x%016x",
+					humanReadbleSquare(tc.square), tc.edges, tc.occupied, actual, tc.expected)
+			}
+		})
 	}
 }
 
 func TestMaskRookAttacks(t *testing.T) {
-	expected := uint64(0x000101010101017e)
-	if actual := MaskRookAttacks(A8); expected != actual {
-		t.Errorf("MaskRookAttacks(A8) = 0x%016x, expected 0x%016x", actual, expected)
+	cases := map[string]struct {
+		square   int
+		expected uint64
+	}{
+		"A8": {A8, uint64(0x000101010101017e)},
+		"A5": {A5, uint64(0x000101017e010100)},
+		"B5": {B5, uint64(0x000202027c020200)},
+		"E5": {E5, uint64(0x001010106e101000)},
+		"G5": {G5, uint64(0x004040403e404000)},
+		"H5": {H5, uint64(0x008080807e808000)},
+		"H1": {H1, uint64(0x7e80808080808000)},
 	}
-	expected = uint64(0x000101017e010100)
-	if actual := MaskRookAttacks(A5); expected != actual {
-		t.Errorf("MaskRookAttacks(A5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x000202027c020200)
-	if actual := MaskRookAttacks(B5); expected != actual {
-		t.Errorf("MaskRookAttacks(B5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x001010106e101000)
-	if actual := MaskRookAttacks(E5); expected != actual {
-		t.Errorf("MaskRookAttacks(E5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x004040403e404000)
-	if actual := MaskRookAttacks(G5); expected != actual {
-		t.Errorf("MaskRookAttacks(G5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x008080807e808000)
-	if actual := MaskRookAttacks(H5); expected != actual {
-		t.Errorf("MaskRookAttacks(H5) = 0x%016x, expected 0x%016x", actual, expected)
-	}
-	expected = uint64(0x7e80808080808000)
-	if actual := MaskRookAttacks(H1); expected != actual {
-		t.Errorf("MaskRookAttacks(H1) = 0x%016x, expected 0x%016x", actual, expected)
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			if actual := MaskRookAttacks(tc.square); tc.expected != actual {
+				t.Errorf("MaskRookAttacks(%v) = 0x%016x, expected 0x%016x", humanReadbleSquare(tc.square), actual, tc.expected)
+			}
+		})
 	}
 }
 
 func TestSetOccupancy(t *testing.T) {
-	expected := uint64(0x0000000000000100)
-	attack_map := RookRays(A1, false, 0)
-	bits := CountBits(attack_map)
-	if actual := SetOccupancy(1, bits, attack_map); expected != actual {
-		t.Errorf("SetOccupancy(1, %v, 0x%016x) = 0x%016x, expected 0x%016x", bits, attack_map, actual, expected)
+	attackMap := RookRays(A1, false, 0)
+	bits := CountBits(attackMap)
+	cases := map[string]struct {
+		index    int
+		expected uint64
+	}{
+		"index 1":    {1, 0x0000000000000100},
+		"index 3650": {3650, 0x7200000000010000},
+		"index 4095": {4095, attackMap},
 	}
-	expected = uint64(0x7200000000010000)
-	if actual := SetOccupancy(3650, bits, attack_map); expected != actual {
-		t.Errorf("SetOccupancy(1, %v, 0x%016x) = 0x%016x, expected 0x%016x", bits, attack_map, actual, expected)
-	}
-	expected = attack_map
-	if actual := SetOccupancy(4095, bits, attack_map); expected != actual {
-		t.Errorf("SetOccupancy(1, %v, 0x%016x) = 0x%016x, expected 0x%016x", bits, attack_map, actual, expected)
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			if actual := SetOccupancy(tc.index, bits, attackMap); tc.expected != actual {
+				t.Errorf("SetOccupancy(%v, %v, 0x%016x) = 0x%016x, expected 0x%016x", tc.index, bits, attackMap, actual, tc.expected)
+			}
+		})
 	}
 }

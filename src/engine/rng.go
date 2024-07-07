@@ -1,21 +1,21 @@
 package engine
 
 type RNG struct {
-	random_state uint32
+	randomState uint32
 }
 
 func NewRNG() *RNG {
-	return &RNG{random_state: 1804289383}
+	return &RNG{randomState: 1804289383}
 }
 
 func (r *RNG) XORRand() uint32 {
 	// XOR shift algorithm https://en.wikipedia.org/wiki/Xorshift#Example_implementation
-	next := r.random_state
+	next := r.randomState
 	next ^= next << 13
 	next ^= next >> 17
 	next ^= next << 5
-	r.random_state = next
-	return r.random_state
+	r.randomState = next
+	return r.randomState
 }
 
 func (r *RNG) Rand() uint64 {

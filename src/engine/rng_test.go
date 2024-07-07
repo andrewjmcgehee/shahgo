@@ -5,8 +5,8 @@ import "testing"
 func TestNewRNG(t *testing.T) {
 	r := NewRNG()
 	expected := uint32(1804289383)
-	if actual := r.random_state; expected != actual {
-		t.Errorf("NewRNG() random_state should be 0x%016x but is 0x%016x", expected, actual)
+	if actual := r.randomState; expected != actual {
+		t.Errorf("NewRNG() randomState should be 0x%016x but is 0x%016x", expected, actual)
 	}
 }
 

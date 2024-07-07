@@ -1,13 +1,5 @@
 package engine
 
-const WHITE = 0
-const BLACK = 1
-
-type pair struct {
-	row int
-	col int
-}
-
 var PawnAttacks [2][64]uint64
 var KnightAttacks [64]uint64
 var KingAttacks [64]uint64
@@ -23,60 +15,60 @@ func InitAttacks() {
 }
 
 func InitLeaperAttacks() {
-	for square := uint64(0); square < 64; square++ {
-		PawnAttacks[WHITE][square] = MaskPawnAttacks(WHITE, square)
-		PawnAttacks[BLACK][square] = MaskPawnAttacks(BLACK, square)
+	for square := 0; square < 64; square++ {
+		PawnAttacks[White][square] = MaskPawnAttacks(White, square)
+		PawnAttacks[Black][square] = MaskPawnAttacks(Black, square)
 		KnightAttacks[square] = MaskKnightAttacks(square)
 		KingAttacks[square] = MaskKingAttacks(square)
 	}
 }
 
 func InitSliderAttacks(rook bool) {
-	var attack_mask uint64
-	var relevant_bits uint64
-	for square := uint64(0); square < 64; square++ {
+	var attackMask uint64
+	var relevantBits int
+	for square := 0; square < 64; square++ {
 		if rook {
 			RookMasks[square] = MaskRookAttacks(square)
-			attack_mask = RookMasks[square]
-			relevant_bits = CountBits(attack_mask)
+			attackMask = RookMasks[square]
+			relevantBits = CountBits(attackMask)
 		} else {
 			BishopMasks[square] = MaskBishopAttacks(square)
-			attack_mask = BishopMasks[square]
-			relevant_bits = CountBits(attack_mask)
+			attackMask = BishopMasks[square]
+			relevantBits = CountBits(attackMask)
 		}
-		for i := uint64(0); i < 1<<relevant_bits; i++ {
-			occupied := SetOccupancy(i, relevant_bits, attack_mask)
+		for i := 0; i < 1<<relevantBits; i++ {
+			occupied := SetOccupancy(i, relevantBits, attackMask)
 			if rook {
-				magic_index := (occupied * getRookMagics()[square]) >> (64 - getRookOccupancyCounts()[square])
-				RookAttacks[square][magic_index] = MaskRookAttacksWithOccupancy(square, occupied)
+				magicIdx := (occupied * rookMagics()[square]) >> (64 - rookOccupancyCounts()[square])
+				RookAttacks[square][magicIdx] = MaskRookAttacksWithOccupancy(square, occupied)
 			} else {
-				magic_index := (occupied * getBishopMagics()[square]) >> (64 - getBishopOccupancyCounts()[square])
-				BishopAttacks[square][magic_index] = MaskBishopAttacksWithOccupancy(square, occupied)
+				magicIdx := (occupied * bishopMagics()[square]) >> (64 - bishopOccupancyCounts()[square])
+				BishopAttacks[square][magicIdx] = MaskBishopAttacksWithOccupancy(square, occupied)
 			}
 		}
 	}
 }
 
-func MaskPawnAttacks(side uint64, square uint64) uint64 {
+func MaskPawnAttacks(side, square int) uint64 {
 	attacks := uint64(0)
 	bitboard := uint64(0)
 	SetBit(&bitboard, square)
-	if side == WHITE {
+	if side == White {
 		attacks |= bitboard >> 7
 		attacks |= bitboard >> 9
 	} else {
 		attacks |= bitboard << 7
 		attacks |= bitboard << 9
 	}
-	if bitboard&NOT_A == 0 { // pawn is on A file
-		attacks &= NOT_H
-	} else if bitboard&NOT_H == 0 { // pawn is on H file
-		attacks &= NOT_A
+	if bitboard&NotFileA == 0 { // pawn is on A file
+		attacks &= NotFileH
+	} else if bitboard&NotFileH == 0 { // pawn is on H file
+		attacks &= NotFileA
 	}
 	return attacks
 }
 
-func MaskKnightAttacks(square uint64) uint64 {
+func MaskKnightAttacks(square int) uint64 {
 	attacks := uint64(0)
 	bitboard := uint64(0)
 	SetBit(&bitboard, square)
@@ -88,15 +80,15 @@ func MaskKnightAttacks(square uint64) uint64 {
 	attacks |= bitboard >> 10
 	attacks |= bitboard >> 15
 	attacks |= bitboard >> 17
-	if bitboard&NOT_AB == 0 { // knight is on A or B file
-		attacks &= NOT_GH
-	} else if bitboard&NOT_GH == 0 { // knight is on G or H file
-		attacks &= NOT_AB
+	if bitboard&NotFilesAB == 0 { // knight is on A or B file
+		attacks &= NotFilesGH
+	} else if bitboard&NotFilesGH == 0 { // knight is on G or H file
+		attacks &= NotFilesAB
 	}
 	return attacks
 }
 
-func MaskKingAttacks(square uint64) uint64 {
+func MaskKingAttacks(square int) uint64 {
 	attacks := uint64(0)
 	bitboard := uint64(0)
 	SetBit(&bitboard, square)
@@ -108,54 +100,54 @@ func MaskKingAttacks(square uint64) uint64 {
 	attacks |= bitboard >> 7
 	attacks |= bitboard >> 8
 	attacks |= bitboard >> 9
-	if bitboard&NOT_A == 0 { // king is on A file
-		attacks &= NOT_H
-	} else if bitboard&NOT_H == 0 { // king is on H file
-		attacks &= NOT_A
+	if bitboard&NotFileA == 0 { // king is on A file
+		attacks &= NotFileH
+	} else if bitboard&NotFileH == 0 { // king is on H file
+		attacks &= NotFileA
 	}
 	return attacks
 }
 
-func BishopRays(square uint64, edges bool, occupied uint64) uint64 {
+func BishopRays(square int, edges bool, occupied uint64) uint64 {
 	rays := uint64(0)
 	r, f := RankOf(square)+1, FileOf(square)+1
 	for SafeCoord(r, f) {
 		if !edges && !SafeCoord(r+1, f+1) {
 			break
 		}
-		bit := uint64(1) << uint64(SquareFrom(r, f))
+		bit := uint64(1 << SquareFrom(r, f))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
-		r += 1
-		f += 1
+		r++
+		f++
 	}
 	r, f = RankOf(square)+1, FileOf(square)-1
 	for SafeCoord(r, f) {
 		if !edges && !SafeCoord(r+1, f-1) {
 			break
 		}
-		bit := uint64(1) << uint64(SquareFrom(r, f))
+		bit := uint64(1 << SquareFrom(r, f))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
-		r += 1
-		f -= 1
+		r++
+		f--
 	}
 	r, f = RankOf(square)-1, FileOf(square)+1
 	for SafeCoord(r, f) {
 		if !edges && !SafeCoord(r-1, f+1) {
 			break
 		}
-		bit := uint64(1) << uint64(SquareFrom(r, f))
+		bit := uint64(1 << SquareFrom(r, f))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
-		r -= 1
-		f += 1
+		r--
+		f++
 	}
 	r = RankOf(square) - 1
 	f = FileOf(square) - 1
@@ -163,105 +155,105 @@ func BishopRays(square uint64, edges bool, occupied uint64) uint64 {
 		if !edges && !SafeCoord(r-1, f-1) {
 			break
 		}
-		bit := uint64(1) << uint64(SquareFrom(r, f))
+		bit := uint64(1 << SquareFrom(r, f))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
-		r -= 1
-		f -= 1
+		r--
+		f--
 	}
 	return rays
 }
 
-func MaskBishopAttacks(square uint64) uint64 {
+func MaskBishopAttacks(square int) uint64 {
 	return BishopRays(square, false, 0)
 }
 
-func MaskBishopAttacksWithOccupancy(square uint64, occupied uint64) uint64 {
+func MaskBishopAttacksWithOccupancy(square int, occupied uint64) uint64 {
 	return BishopRays(square, true, occupied)
 }
 
-func GetBishopAttacks(square uint64, occupied uint64) uint64 {
+func GetBishopAttacks(square int, occupied uint64) uint64 {
 	occupied &= BishopMasks[square]
-	occupied *= getBishopMagics()[square]
-	occupied >>= 64 - getBishopOccupancyCounts()[square]
+	occupied *= bishopMagics()[square]
+	occupied >>= 64 - bishopOccupancyCounts()[square]
 	return BishopAttacks[square][occupied]
 }
 
-func RookRays(square uint64, edges bool, occupied uint64) uint64 {
+func RookRays(square int, edges bool, occupied uint64) uint64 {
 	rays := uint64(0)
 	rank, file := RankOf(square)-1, FileOf(square)
 	for SafeCoord(rank, file) {
 		if !edges && !SafeCoord(rank-1, file) {
 			break
 		}
-		bit := uint64(1) << uint64(SquareFrom(rank, file))
+		bit := uint64(1 << SquareFrom(rank, file))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
-		rank -= 1
+		rank--
 	}
 	rank = RankOf(square) + 1
 	for SafeCoord(rank, file) {
 		if !edges && !SafeCoord(rank+1, file) {
 			break
 		}
-		bit := uint64(1) << uint64(SquareFrom(rank, file))
+		bit := uint64(1 << SquareFrom(rank, file))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
-		rank += 1
+		rank++
 	}
 	rank, file = RankOf(square), FileOf(square)-1
 	for SafeCoord(rank, file) {
 		if !edges && !SafeCoord(rank, file-1) {
 			break
 		}
-		bit := uint64(1) << uint64(SquareFrom(rank, file))
+		bit := uint64(1 << SquareFrom(rank, file))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
-		file -= 1
+		file--
 	}
 	file = FileOf(square) + 1
 	for SafeCoord(rank, file) {
 		if !edges && !SafeCoord(rank, file+1) {
 			break
 		}
-		bit := uint64(1) << uint64(SquareFrom(rank, file))
+		bit := uint64(1 << SquareFrom(rank, file))
 		rays |= bit
 		if occupied&bit != 0 {
 			break
 		}
-		file += 1
+		file++
 	}
 	return rays
 }
 
-func MaskRookAttacks(square uint64) uint64 {
+func MaskRookAttacks(square int) uint64 {
 	return RookRays(square, false, 0)
 }
 
-func MaskRookAttacksWithOccupancy(square uint64, occupied uint64) uint64 {
+func MaskRookAttacksWithOccupancy(square int, occupied uint64) uint64 {
 	return RookRays(square, true, occupied)
 }
 
-func GetRookAttacks(square uint64, occupied uint64) uint64 {
+func GetRookAttacks(square int, occupied uint64) uint64 {
 	occupied &= RookMasks[square]
-	occupied *= getRookMagics()[square]
-	occupied >>= 64 - getRookOccupancyCounts()[square]
+	occupied *= rookMagics()[square]
+	occupied >>= 64 - rookOccupancyCounts()[square]
 	return RookAttacks[square][occupied]
 }
 
-func SetOccupancy(index uint64, relevant_bits uint64, attack_mask uint64) uint64 {
+func SetOccupancy(index, relevantBits int, attackMask uint64) uint64 {
 	occupied := uint64(0)
-	for count := uint64(0); count < relevant_bits; count++ {
-		square := LSBIndex(attack_mask)
-		PopBit(&attack_mask, square)
+	for count := 0; count < relevantBits; count++ {
+		square := LSBIndex(attackMask)
+		PopBit(&attackMask, square)
 		if index&(1<<count) != 0 {
 			occupied |= 1 << square
 		}

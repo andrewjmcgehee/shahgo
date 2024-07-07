@@ -1,127 +1,250 @@
 package engine
 
+// colors
+const (
+	White = iota
+	Black
+	Both
+)
+
 // squares
 const (
-	A8 uint64 = iota
-	B8 uint64 = iota
-	C8 uint64 = iota
-	D8 uint64 = iota
-	E8 uint64 = iota
-	F8 uint64 = iota
-	G8 uint64 = iota
-	H8 uint64 = iota
-	A7 uint64 = iota
-	B7 uint64 = iota
-	C7 uint64 = iota
-	D7 uint64 = iota
-	E7 uint64 = iota
-	F7 uint64 = iota
-	G7 uint64 = iota
-	H7 uint64 = iota
-	A6 uint64 = iota
-	B6 uint64 = iota
-	C6 uint64 = iota
-	D6 uint64 = iota
-	E6 uint64 = iota
-	F6 uint64 = iota
-	G6 uint64 = iota
-	H6 uint64 = iota
-	A5 uint64 = iota
-	B5 uint64 = iota
-	C5 uint64 = iota
-	D5 uint64 = iota
-	E5 uint64 = iota
-	F5 uint64 = iota
-	G5 uint64 = iota
-	H5 uint64 = iota
-	A4 uint64 = iota
-	B4 uint64 = iota
-	C4 uint64 = iota
-	D4 uint64 = iota
-	E4 uint64 = iota
-	F4 uint64 = iota
-	G4 uint64 = iota
-	H4 uint64 = iota
-	A3 uint64 = iota
-	B3 uint64 = iota
-	C3 uint64 = iota
-	D3 uint64 = iota
-	E3 uint64 = iota
-	F3 uint64 = iota
-	G3 uint64 = iota
-	H3 uint64 = iota
-	A2 uint64 = iota
-	B2 uint64 = iota
-	C2 uint64 = iota
-	D2 uint64 = iota
-	E2 uint64 = iota
-	F2 uint64 = iota
-	G2 uint64 = iota
-	H2 uint64 = iota
-	A1 uint64 = iota
-	B1 uint64 = iota
-	C1 uint64 = iota
-	D1 uint64 = iota
-	E1 uint64 = iota
-	F1 uint64 = iota
-	G1 uint64 = iota
-	H1 uint64 = iota
+	A8 = iota
+	B8
+	C8
+	D8
+	E8
+	F8
+	G8
+	H8
+	A7
+	B7
+	C7
+	D7
+	E7
+	F7
+	G7
+	H7
+	A6
+	B6
+	C6
+	D6
+	E6
+	F6
+	G6
+	H6
+	A5
+	B5
+	C5
+	D5
+	E5
+	F5
+	G5
+	H5
+	A4
+	B4
+	C4
+	D4
+	E4
+	F4
+	G4
+	H4
+	A3
+	B3
+	C3
+	D3
+	E3
+	F3
+	G3
+	H3
+	A2
+	B2
+	C2
+	D2
+	E2
+	F2
+	G2
+	H2
+	A1
+	B1
+	C1
+	D1
+	E1
+	F1
+	G1
+	H1
+	NoSquare
 )
 
 // ranks
-const RANK_1 uint64 = 0xff00000000000000
-const RANK_2 uint64 = 0x00ff000000000000
-const RANK_3 uint64 = 0x0000ff0000000000
-const RANK_4 uint64 = 0x000000ff00000000
-const RANK_5 uint64 = 0x00000000ff000000
-const RANK_6 uint64 = 0x0000000000ff0000
-const RANK_7 uint64 = 0x000000000000ff00
-const RANK_8 uint64 = 0x00000000000000ff
+const Rank1 uint64 = 0xff00000000000000
+const Rank2 uint64 = 0x00ff000000000000
+const Rank3 uint64 = 0x0000ff0000000000
+const Rank4 uint64 = 0x000000ff00000000
+const Rank5 uint64 = 0x00000000ff000000
+const Rank6 uint64 = 0x0000000000ff0000
+const Rank7 uint64 = 0x000000000000ff00
+const Rank8 uint64 = 0x00000000000000ff
 
 // files
-const FILE_A uint64 = 0x0101010101010101
-const FILE_B uint64 = 0x0202020202020202
-const FILE_C uint64 = 0x0404040404040404
-const FILE_D uint64 = 0x0808080808080808
-const FILE_E uint64 = 0x1010101010101010
-const FILE_F uint64 = 0x2020202020202020
-const FILE_G uint64 = 0x4040404040404040
-const FILE_H uint64 = 0x8080808080808080
+const FileA uint64 = 0x0101010101010101
+const FileB uint64 = 0x0202020202020202
+const FileC uint64 = 0x0404040404040404
+const FileD uint64 = 0x0808080808080808
+const FileE uint64 = 0x1010101010101010
+const FileF uint64 = 0x2020202020202020
+const FileG uint64 = 0x4040404040404040
+const FileH uint64 = 0x8080808080808080
 
 // colors
-const WHITE_SQUARES uint64 = 0xaa55aa55aa55aa55
-const BLACK_SQUARES uint64 = 0x55aa55aa55aa55aa
+const WhiteSquares uint64 = 0xaa55aa55aa55aa55
+const BlackSquares uint64 = 0x55aa55aa55aa55aa
 
 // interesting squares
-const SQUARE_CENTER uint64 = 0x0000001818000000
-const LARGE_SQUARE_CENTER uint64 = 0x00003c3c3c3c0000
-const LONG_DIAGONALS uint64 = 0x8142241818244281
+const SquareCenter uint64 = 0x0000001818000000
+const LargeSquareCenter uint64 = 0x00003c3c3c3c0000
+const LongDiagonals uint64 = 0x8142241818244281
 
 // sides of board
-const LEFT_HALF uint64 = FILE_A | FILE_B | FILE_C | FILE_D
-const RIGHT_HALF uint64 = FILE_E | FILE_F | FILE_G | FILE_H
+const LeftHalf uint64 = FileA | FileB | FileC | FileD
+const RightHalf uint64 = FileE | FileF | FileG | FileH
 
 // special ranks
-const PROMOTION_RANKS uint64 = RANK_1 | RANK_8
+const PromotionRanks uint64 = Rank1 | Rank8
+
+// castling
+const (
+	WhiteKingside = 1 << iota
+	WhiteQueenside
+	BlackKingside
+	BlackQueenside
+)
+
+func getCastlingRightsMap() map[int]string {
+	return map[int]string{
+		1: "K",
+		2: "Q",
+		4: "k",
+		8: "q",
+	}
+}
+
+// piece types
+const (
+	WhitePawns = iota
+	WhiteKnights
+	WhiteBishops
+	WhiteRooks
+	WhiteQueen
+	WhiteKing
+	BlackPawns
+	BlackKnights
+	BlackBishops
+	BlackRooks
+	BlackQueen
+	BlackKing
+)
+const (
+	Pawn = iota
+	Knight
+	Bishop
+	Rook
+	Queen
+	King
+)
+
+func newPieceBitboards() [12]uint64 {
+	return [12]uint64{
+		Rank2,              // white pawns
+		0x2400000000000000, // white knights
+		0x4200000000000000, // white bishops
+		0x8100000000000000, // white rooks
+		0x0800000000000000, // white queen
+		0x1000000000000000, // white king,
+		Rank7,              // black pawns
+		0x0000000000000024, // black knights
+		0x0000000000000042, // black bishops
+		0x0000000000000081, // black rooks
+		0x0000000000000008, // black queen
+		0x0000000000000010, // black king,
+	}
+}
+
+func newOccupancyBitBoards() [3]uint64 {
+	pieces := newPieceBitboards()
+	white := pieces[0] | pieces[1] | pieces[2] | pieces[3] | pieces[4] | pieces[5]
+	black := pieces[6] | pieces[7] | pieces[8] | pieces[9] | pieces[10] | pieces[11]
+	return [3]uint64{
+		white,
+		black,
+		white | black,
+	}
+}
+
+// piece printing
+func pieceBytesToIndicesMap() map[byte]int {
+	return map[byte]int{
+		'P': 0,
+		'N': 1,
+		'B': 2,
+		'R': 3,
+		'Q': 4,
+		'K': 5,
+		'p': 6,
+		'n': 7,
+		'b': 8,
+		'r': 9,
+		'q': 10,
+		'k': 11,
+	}
+}
+
+func unicodePieceStrings() []string {
+	return []string{
+		"♟",
+		"♞",
+		"♝",
+		"♜",
+		"♛",
+		"♚",
+		"♙",
+		"♘",
+		"♗",
+		"♖",
+		"♕",
+		"♔",
+	}
+}
+
+func unicodePieceFromCode(code int) string {
+	return unicodePieceStrings()[code]
+}
+
+// FEN codes
+const FenEmpty = "8/8/8/8/8/8/8/8 w - -"
+const FenStart = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+const FenTricky = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
+const FenKill = "rnbqkb1r/pp1p1pPp/8/2p1pP2/1P1P4/3P3P/P1P1P3/RNBQKBNR w KQkq e6 0 1"
+const FenCMK = "r2q1rk1/ppp2ppp/2n1bn2/2b1p3/3pP3/3P1NPP/PPP1NPB1/R1BQ1RK1 b - - 0 9"
 
 // all files
-func getAllFiles() [8]uint64 {
-	return [8]uint64{FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H}
+func allFiles() [8]uint64 {
+	return [8]uint64{FileA, FileB, FileC, FileD, FileE, FileF, FileG, FileH}
 }
 
 // all ranks
-func getAllRanks() [8]uint64 {
-	return [8]uint64{RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8}
+func allRanks() [8]uint64 {
+	return [8]uint64{Rank1, Rank2, Rank3, Rank4, Rank5, Rank6, Rank7, Rank8}
 }
 
 // file complements
-const NOT_A uint64 = ^FILE_A
-const NOT_H uint64 = ^FILE_H
-const NOT_AB uint64 = ^FILE_A & ^FILE_B
-const NOT_GH uint64 = ^FILE_G & ^FILE_H
+const NotFileA uint64 = ^FileA
+const NotFileH uint64 = ^FileH
+const NotFilesAB uint64 = ^FileA & ^FileB
+const NotFilesGH uint64 = ^FileG & ^FileH
 
-func getBishopOccupancyCounts() [64]uint64 {
-	return [64]uint64{
+func bishopOccupancyCounts() [64]int {
+	return [64]int{
 		6, 5, 5, 5, 5, 5, 5, 6,
 		5, 5, 5, 5, 5, 5, 5, 5,
 		5, 5, 7, 7, 7, 7, 5, 5,
@@ -133,7 +256,7 @@ func getBishopOccupancyCounts() [64]uint64 {
 	}
 }
 
-func getBishopMagics() [64]uint64 {
+func bishopMagics() [64]uint64 {
 	return [64]uint64{
 		0x0040040844404084,
 		0x002004208a004208,
@@ -202,8 +325,8 @@ func getBishopMagics() [64]uint64 {
 	}
 }
 
-func getRookOccupancyCounts() [64]uint64 {
-	return [64]uint64{
+func rookOccupancyCounts() [64]int {
+	return [64]int{
 		12, 11, 11, 11, 11, 11, 11, 12,
 		11, 10, 10, 10, 10, 10, 10, 11,
 		11, 10, 10, 10, 10, 10, 10, 11,
@@ -215,7 +338,7 @@ func getRookOccupancyCounts() [64]uint64 {
 	}
 }
 
-func getRookMagics() [64]uint64 {
+func rookMagics() [64]uint64 {
 	return [64]uint64{
 		0x8a80104000800020,
 		0x0140002000100040,
@@ -282,4 +405,15 @@ func getRookMagics() [64]uint64 {
 		0x02006104900a0804,
 		0x0001004081002402,
 	}
+}
+
+func humanReadbleSquare(square int) string {
+	return string([]byte{byte(FileOf(square) + 'a'), byte(RankOf(square) + '1')})
+}
+
+func humanReadbleTurn(turn int) string {
+	if turn == White {
+		return "white"
+	}
+	return "black"
 }
